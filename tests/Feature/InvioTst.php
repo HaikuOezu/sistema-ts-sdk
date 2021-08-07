@@ -89,9 +89,18 @@ yOukb9CRvgr1irK7KY6Hkpdua2RnuA==
         $config->setEnvironment(TsConfig::ENV_TEST);
         $client=TsClient::getInstance($config);
         /** @var \SistemaTs\Types\Type\RicevutaPdfResponse $answer */
-        $answer=$client->ricevutaPdf($protocollo,self::USER,self::PASSWORD,self::PINCODE);
+        do {
+            $answer=$client->ricevutaPdf($protocollo,self::USER,self::PASSWORD,self::PINCODE);
+            $rc=$answer->getDatiOutputRichiesta()->getEsitoChiamata();
+            if ($rc) {
+                $errorCode= $answer->getDatiOutputRichiesta()->getEsitiNegativi()->getDettaglioEsitoNegativo()->getCodice();
+            }
+            if ($rc) sleep(5);
+        } while ($rc==1 and $errorCode=="WS15");
+        if ($rc) file_put_contents("{$protocollo}.txt", $answer->getDatiOutputRichiesta()->getEsitiNegativi()->getDettaglioEsitoNegativo()->getCodice() . ' ' .$answer->getDatiOutputRichiesta()->getEsitiNegativi()->getDettaglioEsitoNegativo()->getDescrizione());
         $this->assertEquals("0",$answer->getDatiOutputRichiesta()->getEsitoChiamata());
         return [$protocollo,$answer->getDatiOutputRichiesta()->getEsitiPositivi()->getDettagliEsito()->getPdf()];
+            
     }
     /** @depends testRicevuta */
     public function testPdf($data) {
