@@ -1,5 +1,5 @@
 <?php 
-include __DIR__.'/vendor/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 use SistemaTs\TsConfig;
 use SistemaTs\TsClient;
 use SistemaTs\Documento;
@@ -24,8 +24,7 @@ $doc
 ->addRow("1200.00", "10.00")
 ->addInvoice(Carbon::now(), "2", "GRGGNN60T30D612N")
 ->addRow("1400.00", "10.00")
-->addRow("1600.00", "10.00")
-;
+->addRow("1600.00", "10.00");
 echo "\n";
 echo  $doc->dump();
 echo "\n";
