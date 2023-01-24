@@ -11,10 +11,12 @@ use SimpleXMLElement;
  */
 class Documento
 {
+    private $cf;
     private $cf_cifrato;
     private $piva;
     private $currentInvoice;
     private $xml;
+    
     public function __construct($cf,$piva,$opzionale1=null,$opzionale2=null,$opzionale3=null) {
         $this->currentInvoice=null;
         $this->cf=$cf;
