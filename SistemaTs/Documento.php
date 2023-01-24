@@ -16,7 +16,7 @@ class Documento
     private $piva;
     private $currentInvoice;
     private $xml;
-    
+
     public function __construct($cf,$piva,$opzionale1=null,$opzionale2=null,$opzionale3=null) {
         $this->currentInvoice=null;
         $this->cf=$cf;
@@ -52,12 +52,12 @@ class Documento
         return $this;
         
     }
-    public function addRow($importo,$aliquota,$tipoSpesa=1) {
+    public function addRow($importo,$aliquota,$tipoSpesa='SR') {
        
         $importo=number_format($importo,2,'.','');
         $aliquota=number_format($aliquota,2,'.','');
         $voceSpesa = $this->currentInvoice->addChild('voceSpesa');
-        $voceSpesa->addChild('tipoSpesa', 'SR');
+        $voceSpesa->addChild('tipoSpesa', $tipoSpesa);
         $voceSpesa->addChild('importo', $importo);
         $voceSpesa->addChild('aliquotaIVA', $aliquota);
         return $this;
