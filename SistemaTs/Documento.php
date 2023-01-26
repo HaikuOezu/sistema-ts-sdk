@@ -14,6 +14,9 @@ class Documento
     private $cf;
     private $cf_cifrato;
     private $piva;
+    /**
+     * @var \SimpleXMLElement
+     */
     public $currentInvoice;
     private $xml;
 
@@ -63,7 +66,7 @@ class Documento
         return $this;
     }
     public function getCfProrietario(Bool $crypted=true) {
-        return $crypted?$this->cf_enc:$this->cf;
+        return $crypted?$this->cf_cifrato:$this->cf;
     }
     public function dump($fname=null) {
         return $fname?$this->xml->asXML($fname):$this->xml->asXML();
