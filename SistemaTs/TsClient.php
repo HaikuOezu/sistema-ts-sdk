@@ -2,6 +2,7 @@
 namespace SistemaTs;
 
 use Carbon\Carbon;
+use SimpleXMLElement;
 use SoapClient;
 use ZipArchive;
 
@@ -18,9 +19,11 @@ class TsClient
 
     static private $instance=null;
     private $config;
+
     private function __construct(TsConfig $config) {
         $this->config=$config;    
     }
+
     static public function getInstance(?TsConfig $config=null) : self {
         if (!is_object(self::$instance)) {
         if (empty($config)) {
@@ -30,7 +33,77 @@ class TsClient
         }
         return self::$instance;
     }
+
+    public function cancellazione(String $pIva, String $dataEmissione, String $numDocumento, String $login,String $password, String $pincode) {
+        $soap=$this->getSoap(TsConfig::OP_INVIO_SINCRONO,$login,$password);
+        $soapBody=[
+                "pincode"	=> TsCrypt::crypt($pincode),
+                "Proprietario"		=> [ "cfProprietario" => TsCrypt::crypt($login) ] 
+            ]
+        ;
+        $soapBody["idCancellazioneDocumentoFiscale"] = [
+            "pIva" => $pIva,
+            "dataEmissione" => $dataEmissione,
+            "numDocumentoFiscale" => [
+                "dispositivo" => '1',
+                "numDocumento" => $numDocumento,
+            ],
+        ];
+        
+        return $soap->Cancellazione($soapBody);
+    }
+
+    public function rimborso(String $pIva, String $dataEmissione, String $numDocumento, Documento $doc,String $login,String $password, String $pincode) {
+        $soap=$this->getSoap(TsConfig::OP_INVIO_SINCRONO,$login,$password);
+        $soapBody=[
+                "pincode"	=> TsCrypt::crypt($pincode),
+                "Proprietario"		=> [ "cfProprietario" => TsCrypt::crypt($login) ] 
+            ]
+        ;
+        $json = json_encode($doc->currentInvoice);
+        $array = json_decode($json,TRUE);
+        $soapBody["idRimborsoDocumentoFiscale"] = [
+            "pIva" => $pIva,
+            "dataEmissione" => $dataEmissione,
+            "numDocumentoFiscale" => [
+                "dispositivo" => '1',
+                "numDocumento" => $numDocumento,
+            ],
+        ];
+        $soapBody["DocumentoSpesa"]=$array;
+
+        return $soap->Rimborso($soapBody);
+    }
+
+    public function variazione(Documento $doc,String $login,String $password, String $pincode) {
+        $soap=$this->getSoap(TsConfig::OP_INVIO_SINCRONO,$login,$password);
+        $soapBody=[
+                "pincode"	=> TsCrypt::crypt($pincode),
+                "Proprietario"		=> [ "cfProprietario" => TsCrypt::crypt($login) ] 
+            ]
+        ;
+        $json = json_encode($doc->currentInvoice);
+        $array = json_decode($json,TRUE);
+        $soapBody["idVariazioneDocumentoFiscale"]=$array;
+
+        return $soap->Variazione($soapBody);
+    }
+
     public function invio(Documento $doc,String $login,String $password, String $pincode) {
+        $soap=$this->getSoap(TsConfig::OP_INVIO_SINCRONO,$login,$password);
+        $soapBody=[
+                "pincode"	=> TsCrypt::crypt($pincode),
+                "Proprietario"		=> [ "cfProprietario" => TsCrypt::crypt($login) ] 
+            ]
+        ;
+        $json = json_encode($doc->currentInvoice);
+        $array = json_decode($json,TRUE);
+        $soapBody["idInserimentoDocumentoFiscale"]=$array;
+
+        return $soap->Inserimento($soapBody);
+    }
+
+    public function invioMultiplo(Documento $doc,String $login,String $password, String $pincode) {
         $soap=$this->getSoap(TsConfig::OP_INVIO,$login,$password);
         $fname=sys_get_temp_dir().'/TS_'.Carbon::now()->format('Y-m-d_His').'.xml';
         $zipname="{$fname}.zip";
@@ -45,10 +118,10 @@ class TsClient
                 "datiProprietario"		=> [ "cfProprietario" => $login ] 
             ]
         ;
-        $soapBody["documento"]=file_get_contents($zipname);
-        //return;        
+        $soapBody["documento"]=file_get_contents($zipname); 
         return $soap->inviaFileMtom($soapBody);
     }
+
     public function ricevutaPdf( String $protocollo,String $login,String $password, String $pincode) {
         $soap=$this->getSoap(TsConfig::OP_RICEVUTA,$login,$password);
         $soapBody=[
@@ -58,13 +131,12 @@ class TsClient
                 ]
         ]
         ;
-        //return;
         return $soap->RicevutaPdf($soapBody);
     }
+
     public function getSoap($operation,$login,$password) : \SoapClient {
         $classmapper='\\SistemaTs\\Types\\'. ucfirst($operation) .'Classmap';
         $soapClientParam = [
-//            "location"		=> "x",
             "soap_version" => SOAP_1_1,
             "login"		=> $login,
             "password"		=> $password,
@@ -73,10 +145,6 @@ class TsClient
             "exceptions"	=> false,
             "location" => $this->config->getDomain().$this->config->getEndpoint($operation),
             "classmap" => $classmapper::getMap(),
-//            'uri' => 'http://ejb.invioTelematicoSS730p.sanita.finanze.it/',
-//            'location' => $this->location,
-//            'location' => 'https://invioSS730pTest.sanita.finanze.it/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort',
-//            'location' => "https://invioSS730p.sanita.finanze.it/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort",
             'cache_wsdl' => WSDL_CACHE_NONE
         ];
         if ($this->config->getEnvironment()==TsConfig::ENV_TEST) {
@@ -89,7 +157,6 @@ class TsClient
                 ],
             ]);
         }
-//        $SoapClientParam['location']=$this->uri;
         return new \SoapClient($this->config->getWdsl($operation),$soapClientParam);
     }
 }

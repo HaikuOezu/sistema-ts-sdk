@@ -8,6 +8,7 @@ namespace SistemaTs;
  */
 class TsConfig
 {
+    const OP_INVIO_SINCRONO='invioSicrono';
     const OP_INVIO='invio';
     const OP_ESITO='esito';
     const OP_ERRORE='errore';
@@ -16,12 +17,14 @@ class TsConfig
     const ENV_TEST="test";
     private const defaultConfig=[
         'wsdl' => [
+            self::OP_INVIO_SINCRONO => __DIR__.'/../resources/DocumentoSpesa730p.wsdl',
             self::OP_INVIO => __DIR__.'/../resources/InvioTelematicoSpeseSanitarie730p.wsdl',
             self::OP_ESITO => __DIR__.'/../resources/EsitoInvioDatiSpesa730Service.wsdl',
             self::OP_ERRORE => __DIR__.'/../resources/DettaglioErrori730Service.wsdl',
             self::OP_RICEVUTA => __DIR__.'/../resources/RicevutaPdf730Service.wsdl',
         ],
         'endpoint' => [
+            self::OP_INVIO_SINCRONO => '/DocumentoSpesa730pWeb/DocumentoSpesa730pPort',
             self::OP_INVIO => '/InvioTelematicoSS730pMtomWeb/InvioTelematicoSS730pMtomPort',
             self::OP_ESITO=>'/EsitoStatoInviiWEB/DettaglioErrori730Service',
             self::OP_ERRORE => __DIR__.'/../resources/DettaglioErrori730Service.wsdl',
