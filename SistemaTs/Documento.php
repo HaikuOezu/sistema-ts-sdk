@@ -20,7 +20,7 @@ class Documento
     public $currentInvoice;
     private $xml;
 
-    public function __construct($cf,$piva,$opzionale1=null,$opzionale2=null,$opzionale3=null) {
+    public function __construct($cf, $piva, $opzionale1=null, $opzionale2=null, $opzionale3=null) {
         $this->currentInvoice=null;
         $this->cf=$cf;
         $this->cf_cifrato=TsCrypt::crypt($this->cf);
@@ -37,7 +37,7 @@ class Documento
         
         $proprietario->addChild('cfProprietario', $this->cf_cifrato);
     }
-    public function addInvoice(DateTime $data,String $numDoc,String $cf,Bool $tracciato=true) {
+    public function addInvoice(DateTime $data, String $numDoc, String $cf = null, Bool $tracciato = true) {
         $documentoSpesa = $this->xml->addChild('documentoSpesa');
         $idSpesa = $documentoSpesa->addChild('idSpesa');
         $idSpesa->addChild('pIva', $this->piva);
@@ -47,10 +47,14 @@ class Documento
         $numDocumentoFiscale->addChild('numDocumento', $numDoc);
         $documentoSpesa->addChild('dataPagamento', $data->format('Y-m-d'));
         $documentoSpesa->addChild('flagOperazione', 'I');
-        $documentoSpesa->addChild('cfCittadino', TsCrypt::crypt($cf));
-        $documentoSpesa->addChild('pagamentoTracciato', $tracciato?'SI':'NO');
+        if ($cf) {
+            $documentoSpesa->addChild('cfCittadino', TsCrypt::crypt($cf));
+            $documentoSpesa->addChild('flagOpposizione', 0);
+        } else {
+            $documentoSpesa->addChild('flagOpposizione', 1);
+        }
+        $documentoSpesa->addChild('pagamentoTracciato', $tracciato? 'SI' : 'NO');
         $documentoSpesa->addChild('tipoDocumento', 'F');
-        $documentoSpesa->addChild('flagOpposizione', 0);
         $this->currentInvoice=$documentoSpesa;
         return $this;
         
