@@ -59,12 +59,19 @@ class Documento
         return $this;
         
     }
-    public function addRow($importo,$aliquota,$tipoSpesa='SR') {
+    public function addRow($importo, $aliquota, $tipoSpesa = 'SR', $flagTipoSpesa = false) {
        
         $importo=number_format($importo,2,'.','');
         $aliquota=number_format($aliquota,2,'.','');
         $voceSpesa = $this->currentInvoice->addChild('voceSpesa');
         $voceSpesa->addChild('tipoSpesa', $tipoSpesa);
+        if ($flagTipoSpesa) {
+            if ($tipoSpesa == 'TK') {
+                $voceSpesa->addChild('flagTipoSpesa', 1);
+            } else if ($tipoSpesa == 'SR') {
+                $voceSpesa->addChild('flagTipoSpesa', 2);
+            }
+        }
         $voceSpesa->addChild('importo', $importo);
         $voceSpesa->addChild('aliquotaIVA', $aliquota);
         return $this;
