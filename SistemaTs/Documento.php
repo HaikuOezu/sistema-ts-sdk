@@ -59,7 +59,7 @@ class Documento
         return $this;
         
     }
-    public function addRow($importo, $aliquota, $tipoSpesa = 'SR', $flagTipoSpesa = false) {
+    public function addRow($importo, $aliquota, $natura = null, $tipoSpesa = 'SR', $flagTipoSpesa = false) {
        
         $importo=number_format($importo,2,'.','');
         $aliquota=number_format($aliquota,2,'.','');
@@ -73,7 +73,11 @@ class Documento
             }
         }
         $voceSpesa->addChild('importo', $importo);
-        $voceSpesa->addChild('aliquotaIVA', $aliquota);
+        if ($aliquota == 0 && $natura !== null) {
+            $voceSpesa->addChild('naturaIVA', $natura);
+        } else {
+            $voceSpesa->addChild('aliquotaIVA', $aliquota);
+        }
         return $this;
     }
     public function getCfProrietario(Bool $crypted=true) {
