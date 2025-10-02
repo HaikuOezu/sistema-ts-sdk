@@ -1,5 +1,5 @@
 {
-	"name" : "alar77/laravel-sistema-ts-sdk",
+	"name" : "haikuoezu/laravel-sistema-ts-sdk",
 	"license" : "MIT",
 	"keywords" : [
 		"laravel",
@@ -12,8 +12,8 @@
 		}
 	],
 	"authors" : [{
-			"name" : "Giovanni Gargani",
-			"email" : "giovanni@gargani.it"
+			"name" : "Haiku Oezu",
+			"email" : "idarbert@gmail.com"
 		}
 	],
 	"require" : {
