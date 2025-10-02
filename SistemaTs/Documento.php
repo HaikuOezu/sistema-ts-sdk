@@ -46,6 +46,9 @@ class Documento
         $numDocumentoFiscale->addChild('dispositivo', '1');
         $numDocumentoFiscale->addChild('numDocumento', $numDoc);
         $documentoSpesa->addChild('dataPagamento', $data->format('Y-m-d'));
+        if ($data < new DateTime('today')) {
+            $documentoSpesa->addChild('flagPagamentoAnticipato', '1');    
+        }
         $documentoSpesa->addChild('flagOperazione', 'I');
         if ($cf) {
             $documentoSpesa->addChild('cfCittadino', TsCrypt::crypt($cf));
