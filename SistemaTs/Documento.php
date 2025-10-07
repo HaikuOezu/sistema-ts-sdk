@@ -37,16 +37,16 @@ class Documento
         
         $proprietario->addChild('cfProprietario', $this->cf_cifrato);
     }
-    public function addInvoice(DateTime $data, String $numDoc, String $cf = null, Bool $tracciato = true) {
+    public function addInvoice(DateTime $dataEmissione, DateTime $dataPagamento, String $numDoc, String $cf = null, Bool $tracciato = true) {
         $documentoSpesa = $this->xml->addChild('documentoSpesa');
         $idSpesa = $documentoSpesa->addChild('idSpesa');
         $idSpesa->addChild('pIva', $this->piva);
-        $idSpesa->addChild('dataEmissione', $data->format('Y-m-d'));
+        $idSpesa->addChild('dataEmissione', $dataEmissione->format('Y-m-d'));
         $numDocumentoFiscale = $idSpesa->addChild('numDocumentoFiscale');
         $numDocumentoFiscale->addChild('dispositivo', '1');
         $numDocumentoFiscale->addChild('numDocumento', $numDoc);
-        $documentoSpesa->addChild('dataPagamento', $data->format('Y-m-d'));
-        if ($data < new DateTime('today')) {
+        $documentoSpesa->addChild('dataPagamento', $dataPagamento->format('Y-m-d'));
+        if ($dataPagamento < $dataEmissione) {
             $documentoSpesa->addChild('flagPagamentoAnticipato', '1');    
         }
         $documentoSpesa->addChild('flagOperazione', 'I');
