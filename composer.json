@@ -20,7 +20,7 @@
 		"ext-openssl" : "*",
 		"ext-soap" : "*",
 		"php" : "^7.3|^8.0",
-		"nesbot/carbon" : "~2.51"
+		"nesbot/carbon" : "~3.9.1"
 	},
 	"autoload" : {
 		"psr-4" : {
